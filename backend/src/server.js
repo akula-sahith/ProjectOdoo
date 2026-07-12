@@ -1,6 +1,9 @@
 // Load environment variables as early as possible
 require('dotenv').config();
 
+const validateEnv = require('./utils/envValidator');
+validateEnv();
+
 const app = require('./app');
 require('./config/db');
 
