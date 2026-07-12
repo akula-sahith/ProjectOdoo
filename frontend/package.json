@@ -21,7 +21,11 @@
     "react-hook-form": "^7.81.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.18.1",
+<<<<<<< HEAD
     "tailwindcss": "^4.3.2",
+=======
+    "recharts": "^3.9.2",
+>>>>>>> 2d460f39a26c5469ec6849bd55379b40680126f0
     "zod": "^4.4.3"
   },
   "devDependencies": {
