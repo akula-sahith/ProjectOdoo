@@ -59,10 +59,48 @@ const findRoleByName = async (roleName) => {
   });
 };
 
+/**
+ * Find all users.
+ */
+const findMany = async () => {
+  return prisma.user.findMany({
+    include: {
+      department: true,
+      role: true
+    }
+  });
+};
+
+/**
+ * Update user details.
+ */
+const update = async (userId, data) => {
+  return prisma.user.update({
+    where: { user_id: Number(userId) },
+    data,
+    include: {
+      department: true,
+      role: true
+    }
+  });
+};
+
+/**
+ * Delete a user by ID.
+ */
+const deleteUser = async (userId) => {
+  return prisma.user.delete({
+    where: { user_id: Number(userId) }
+  });
+};
+
 module.exports = {
   findByEmail,
   findByEmployeeCode,
   findById,
   createUser,
-  findRoleByName
+  findRoleByName,
+  findMany,
+  update,
+  deleteUser
 };
