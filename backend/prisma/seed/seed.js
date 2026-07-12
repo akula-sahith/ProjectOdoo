@@ -1,5 +1,6 @@
 require('dotenv').config();
 const prisma = require('../../src/config/db');
+const bcrypt = require('bcrypt');
 
 async function main() {
   console.log('Seeding database...');
@@ -13,8 +14,9 @@ async function main() {
   ];
 
   console.log('Inserting Roles...');
+  const roles = {};
   for (const role of rolesData) {
-    await prisma.role.upsert({
+    roles[role.role_name] = await prisma.role.upsert({
       where: { role_name: role.role_name },
       update: { description: role.description },
       create: role,
@@ -31,8 +33,9 @@ async function main() {
   ];
 
   console.log('Inserting Departments...');
+  const depts = {};
   for (const dept of departmentsData) {
-    await prisma.department.upsert({
+    depts[dept.department_name] = await prisma.department.upsert({
       where: { department_name: dept.department_name },
       update: { status: dept.status },
       create: dept,
@@ -59,6 +62,64 @@ async function main() {
         status: cat.status
       },
       create: cat,
+    });
+  }
+
+  // 4. Seed Demo Users
+  console.log('Inserting Demo Users...');
+  const passwordHash = await bcrypt.hash('password123', 10);
+
+  const demoUsers = [
+    {
+      employee_code: 'EMP001',
+      full_name: 'Pandu',
+      email: 'pandu@assetflow.com',
+      password_hash: passwordHash,
+      role_id: roles['ASSET_MANAGER'].role_id,
+      department_id: depts['Engineering'].department_id,
+      status: 'ACTIVE'
+    },
+    {
+      employee_code: 'EMP002',
+      full_name: 'Rahul',
+      email: 'rahul@assetflow.com',
+      password_hash: passwordHash,
+      role_id: roles['ADMIN'].role_id,
+      department_id: depts['Operations'].department_id, // IT/Operations
+      status: 'ACTIVE'
+    },
+    {
+      employee_code: 'EMP003',
+      full_name: 'Sarah Chen',
+      email: 'sarah.c@assetflow.com',
+      password_hash: passwordHash,
+      role_id: roles['DEPARTMENT_HEAD'].role_id,
+      department_id: depts['Human Resources'].department_id,
+      status: 'ACTIVE'
+    },
+    {
+      employee_code: 'EMP005',
+      full_name: 'Alice Watson',
+      email: 'alice.w@assetflow.com',
+      password_hash: passwordHash,
+      role_id: roles['EMPLOYEE'].role_id,
+      department_id: depts['Sales'].department_id,
+      status: 'ACTIVE'
+    }
+  ];
+
+  for (const user of demoUsers) {
+    await prisma.user.upsert({
+      where: { email: user.email },
+      update: {
+        employee_code: user.employee_code,
+        full_name: user.full_name,
+        password_hash: user.password_hash,
+        role_id: user.role_id,
+        department_id: user.department_id,
+        status: user.status
+      },
+      create: user
     });
   }
 
