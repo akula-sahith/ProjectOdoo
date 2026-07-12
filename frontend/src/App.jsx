@@ -23,9 +23,9 @@ function App() {
     <AppProvider>
       <BrowserRouter>
         <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-              <Route
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route
             element={
               <ProtectedRoute>
                 <DashboardLayout />
@@ -35,7 +35,7 @@ function App() {
         </Routes>
       </BrowserRouter>
 
-       <Toaster
+      <Toaster
         position="top-right"
         toastOptions={{
           className: 'text-xs font-semibold rounded-xl text-slate-800 border border-slate-100 shadow-lg',
