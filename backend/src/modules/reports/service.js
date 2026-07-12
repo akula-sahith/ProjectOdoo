@@ -1,4 +1,7 @@
-const prisma = require('../../config/db');
+const assetRepository = require('../../repositories/assetRepository');
+const allocationRepository = require('../../repositories/allocationRepository');
+const maintenanceRepository = require('../../repositories/maintenanceRepository');
+const auditRepository = require('../../repositories/auditRepository');
 
 const getAssetsReport = async (filters = {}) => {
   const where = {};
@@ -12,27 +15,7 @@ const getAssetsReport = async (filters = {}) => {
     where.status = filters.status;
   }
 
-  return await prisma.asset.findMany({
-    where,
-    include: {
-      category: true,
-      allocations: {
-        include: {
-          employee: {
-            select: {
-              user_id: true,
-              full_name: true,
-              employee_code: true
-            }
-          }
-        }
-      },
-      transfers: true,
-    },
-    orderBy: {
-      created_at: 'desc',
-    },
-  });
+  return await assetRepository.findManyWithDetails(where);
 };
 
 const getAllocationsReport = async (filters = {}) => {
@@ -50,29 +33,7 @@ const getAllocationsReport = async (filters = {}) => {
     };
   }
 
-  return await prisma.assetAllocation.findMany({
-    where,
-    include: {
-      asset: true,
-      employee: {
-        select: {
-          user_id: true,
-          full_name: true,
-          email: true,
-          employee_code: true
-        }
-      },
-      allocator: {
-        select: {
-          user_id: true,
-          full_name: true
-        }
-      }
-    },
-    orderBy: {
-      allocation_date: 'desc',
-    },
-  });
+  return await allocationRepository.findMany(where);
 };
 
 const getMaintenanceReport = async (filters = {}) => {
@@ -84,32 +45,24 @@ const getMaintenanceReport = async (filters = {}) => {
     where.priority = filters.priority;
   }
 
-  return await prisma.maintenanceRequest.findMany({
-    where,
-    include: {
-      asset: true,
-      raisedByUser: {
-        select: {
-          user_id: true,
-          full_name: true,
-          employee_code: true
-        }
-      },
-      approvedByUser: {
-        select: {
-          user_id: true,
-          full_name: true
-        }
-      }
-    },
-    orderBy: {
-      maintenance_id: 'desc',
-    },
-  });
+  return await maintenanceRepository.findMany(where);
+};
+
+const getAuditsReport = async (filters = {}) => {
+  const where = {};
+  if (filters.audit_cycle_id) {
+    where.audit_cycle_id = Number(filters.audit_cycle_id);
+  }
+  if (filters.verification_status) {
+    where.verification_status = filters.verification_status;
+  }
+
+  return await auditRepository.findRecords(where);
 };
 
 module.exports = {
   getAssetsReport,
   getAllocationsReport,
   getMaintenanceReport,
+  getAuditsReport,
 };
