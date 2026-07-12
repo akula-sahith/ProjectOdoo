@@ -131,7 +131,7 @@ export const DashboardLayout = () => {
           {sidebarOpen ? (
             <div className="flex flex-col">
               <span className="font-bold text-lg tracking-tight text-blue-600">AssetFlow</span>
-              <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Enterprise Asset ERP</span>
+              <span className="text-xs text-slate-400 font-bold tracking-wider uppercase">Enterprise Asset ERP</span>
             </div>
           ) : (
             <span className="font-bold text-lg text-blue-600 mx-auto">AF</span>
@@ -155,7 +155,7 @@ export const DashboardLayout = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all font-medium text-[14px] leading-5 ${
+                className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all font-semibold text-base leading-5 ${
                   isActive
                     ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600 pl-3'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -185,8 +185,8 @@ export const DashboardLayout = () => {
                 className="w-10 h-10 rounded-full border border-slate-200 object-cover"
               />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
-                <p className="text-xs text-slate-500 truncate">{user.designation}</p>
+                <p className="text-base font-bold text-slate-800 truncate">{user.name}</p>
+                <p className="text-sm text-slate-500 truncate">{user.designation}</p>
               </div>
             </div>
           </div>
@@ -216,7 +216,7 @@ export const DashboardLayout = () => {
               <div className="h-[72px] flex items-center justify-between px-6 border-b border-slate-200">
                 <div className="flex flex-col">
                   <span className="font-bold text-lg tracking-tight text-blue-600">AssetFlow</span>
-                  <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">Enterprise Asset ERP</span>
+                  <span className="text-xs text-slate-400 font-bold tracking-wider uppercase">Enterprise Asset ERP</span>
                 </div>
                 <button
                   onClick={() => setMobileDrawerOpen(false)}
@@ -237,7 +237,7 @@ export const DashboardLayout = () => {
                       key={item.name}
                       to={item.path}
                       onClick={() => setMobileDrawerOpen(false)}
-                      className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all font-medium text-[14px] ${
+                      className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all font-semibold text-base ${
                         isActive
                           ? 'bg-blue-50 text-blue-600 border-l-4 border-blue-600 pl-3'
                           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -263,8 +263,8 @@ export const DashboardLayout = () => {
                     className="w-10 h-10 rounded-full border border-slate-200 object-cover"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-800 truncate">{user.name}</p>
-                    <p className="text-xs text-slate-500 truncate">{user.designation}</p>
+                    <p className="text-base font-bold text-slate-800 truncate">{user.name}</p>
+                    <p className="text-sm text-slate-500 truncate">{user.designation}</p>
                   </div>
                 </div>
               )}
@@ -292,7 +292,7 @@ export const DashboardLayout = () => {
                 placeholder="Global Search tags, assets, serials..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition-all bg-slate-50/50"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-500 transition-all bg-slate-50/50"
               />
             </form>
           </div>
@@ -303,7 +303,7 @@ export const DashboardLayout = () => {
             <div className="relative">
               <button
                 onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold rounded-xl cursor-pointer transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-sm font-bold rounded-xl cursor-pointer transition-colors"
                 title="Switch role for demo"
               >
                 <UserSquare2 className="w-4 h-4" />
@@ -322,8 +322,8 @@ export const DashboardLayout = () => {
                       className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-150 overflow-hidden z-30"
                     >
                       <div className="p-3 border-b border-slate-100 bg-slate-50/55">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Demo Swapping Engine</span>
-                        <p className="text-xs text-slate-500 mt-0.5">Test individual role dashboards & security walls.</p>
+                        <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Demo Swapping Engine</span>
+                        <p className="text-sm text-slate-500 mt-0.5">Test individual role dashboards & security walls.</p>
                       </div>
                       <div className="py-1.5 divide-y divide-slate-50 max-h-80 overflow-y-auto">
                         {employees.map((emp) => (
@@ -334,10 +334,10 @@ export const DashboardLayout = () => {
                           >
                             <img src={emp.photo} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
                             <div className="min-w-0 flex-1">
-                              <p className="text-xs font-bold text-slate-800 leading-3">{emp.name}</p>
-                              <p className="text-[10px] text-slate-500 mt-1">{emp.designation}</p>
+                              <p className="text-sm font-bold text-slate-800 leading-3">{emp.name}</p>
+                              <p className="text-xs text-slate-500 mt-1">{emp.designation}</p>
                             </div>
-                            <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded border shrink-0 ${
+                            <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded border shrink-0 ${
                               emp.role === 'Admin' 
                                 ? 'bg-red-50 text-red-700 border-red-150' 
                                 : emp.role === 'Asset Manager' 
@@ -434,8 +434,8 @@ export const DashboardLayout = () => {
                     className="w-8 h-8 rounded-full border border-slate-200 object-cover"
                   />
                   <div className="hidden lg:block">
-                    <p className="text-xs font-semibold text-slate-800 leading-3">{user.name}</p>
-                    <p className="text-[10px] text-slate-450 mt-0.5 font-bold uppercase">{user.role}</p>
+                    <p className="text-sm font-semibold text-slate-800 leading-3">{user.name}</p>
+                    <p className="text-xs text-slate-450 mt-0.5 font-bold uppercase">{user.role}</p>
                   </div>
                   <ChevronDown className="w-4 h-4 text-slate-400 hidden lg:block" />
                 </button>

@@ -136,7 +136,7 @@ export const Dashboard = () => {
       {/* Personalized Welcome Banner */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
             Good Morning, {user.name}
           </h1>
           <p className="text-slate-500 mt-1 text-sm md:text-base">
@@ -156,41 +156,41 @@ export const Dashboard = () => {
           {/* KPI Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Assets</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{totalAssets}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Assets</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">{totalAssets}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Employees Enrolled</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{totalEmployees}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Employees Enrolled</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">{totalEmployees}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Departments</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{totalDepts}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Departments</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">{totalDepts}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Organization Utilization</span>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{orgUtilization}%</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Organization Utilization</span>
+              <p className="text-3xl font-bold text-blue-600 mt-1">{orgUtilization}%</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Assets Near Retirement</span>
-              <p className="text-2xl font-bold text-red-600 mt-1">{poorConditionCount}</p>
+              <span className="text-xs font-bold text-red-500 uppercase tracking-wider">Assets Near Retirement</span>
+              <p className="text-3xl font-bold text-red-600 mt-1">{poorConditionCount}</p>
             </div>
           </div>
 
           {/* Quick Actions */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Admin Quick Setup Actions</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Admin Quick Setup Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Building2 className="w-4 h-4" /> Setup Department
               </button>
-              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <PlusCircle className="w-4 h-4 text-slate-400" /> Create Category
               </button>
-              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/organization-setup')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Users className="w-4 h-4 text-slate-400" /> Add Employee
               </button>
-              <button onClick={() => navigate('/settings')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/settings')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <SettingsIcon className="w-4 h-4 text-slate-400" /> System Settings
               </button>
             </div>
@@ -241,29 +241,29 @@ export const Dashboard = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Available Assets</span>
-                <p className="text-2xl font-bold text-green-700 mt-1">{availableCount}</p>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Available Assets</span>
+                <p className="text-3xl font-bold text-green-700 mt-1">{availableCount}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center"><CheckCircle2 className="w-5 h-5" /></div>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Allocated Assets</span>
-                <p className="text-2xl font-bold text-blue-700 mt-1">{allocatedCount}</p>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Allocated Assets</span>
+                <p className="text-3xl font-bold text-blue-700 mt-1">{allocatedCount}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center"><Package className="w-5 h-5" /></div>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Under Maintenance</span>
-                <p className="text-2xl font-bold text-orange-700 mt-1">{maintenanceCount}</p>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Under Maintenance</span>
+                <p className="text-3xl font-bold text-orange-700 mt-1">{maintenanceCount}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center"><Wrench className="w-5 h-5" /></div>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Transfer Requests</span>
-                <p className="text-2xl font-bold text-purple-700 mt-1">{pendingTransfersCount}</p>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Transfer Requests</span>
+                <p className="text-3xl font-bold text-purple-700 mt-1">{pendingTransfersCount}</p>
               </div>
               <div className="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center"><ArrowRightLeft className="w-5 h-5" /></div>
             </div>
@@ -271,18 +271,18 @@ export const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Manager Quick Actions</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Manager Quick Actions</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <button onClick={() => navigate('/assets?openRegister=true')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/assets?openRegister=true')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <PlusCircle className="w-4 h-4" /> Register Asset
               </button>
-              <button onClick={() => navigate('/allocation')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/allocation')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <ArrowRightLeft className="w-4 h-4 text-slate-400" /> Allocate / Transfer
               </button>
-              <button onClick={() => navigate('/maintenance')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/maintenance')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Wrench className="w-4 h-4 text-slate-400" /> Raise Repairs Ticket
               </button>
-              <button onClick={() => navigate('/reports')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/reports')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <FileSpreadsheet className="w-4 h-4 text-slate-400" /> Export Reports
               </button>
             </div>
@@ -298,36 +298,36 @@ export const Dashboard = () => {
           {/* KPI Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department Assets</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{deptAssets.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Department Assets</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">{deptAssets.length}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Approvals</span>
-              <p className="text-2xl font-bold text-amber-600 mt-1">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Approvals</span>
+              <p className="text-3xl font-bold text-amber-600 mt-1">
                 {transferRequests.filter(t => t.status === 'Pending' && t.requesterId !== user.id).length}
               </p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Department Bookings</span>
-              <p className="text-2xl font-bold text-purple-700 mt-1">{deptBookings.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Department Bookings</span>
+              <p className="text-3xl font-bold text-purple-700 mt-1">{deptBookings.length}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Repairs Tickets</span>
-              <p className="text-2xl font-bold text-orange-700 mt-1">{deptTickets.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Repairs Tickets</span>
+              <p className="text-3xl font-bold text-orange-700 mt-1">{deptTickets.length}</p>
             </div>
           </div>
 
           {/* Quick Actions */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Department Actions</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Department Actions</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <button onClick={() => navigate('/allocation-requests')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/allocation-requests')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <CheckCircle2 className="w-4 h-4" /> Review Transfer Requests
               </button>
-              <button onClick={() => navigate('/resource-booking?openBook=true')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/resource-booking?openBook=true')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Calendar className="w-4 h-4 text-slate-400" /> Book Shared Resource
               </button>
-              <button onClick={() => navigate('/reports')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/reports')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <FileSpreadsheet className="w-4 h-4 text-slate-400" /> Department Reports
               </button>
             </div>
@@ -343,20 +343,20 @@ export const Dashboard = () => {
           {/* KPI Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">My Assigned Assets</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">{myAssets.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">My Assigned Assets</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">{myAssets.length}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">My Active Bookings</span>
-              <p className="text-2xl font-bold text-purple-700 mt-1">{myBookings.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">My Active Bookings</span>
+              <p className="text-3xl font-bold text-purple-700 mt-1">{myBookings.length}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Raised Repair Tickets</span>
-              <p className="text-2xl font-bold text-orange-700 mt-1">{myTickets.length}</p>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Raised Repair Tickets</span>
+              <p className="text-3xl font-bold text-orange-700 mt-1">{myTickets.length}</p>
             </div>
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pending Requests</span>
-              <p className="text-2xl font-bold text-slate-800 mt-1">
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Pending Requests</span>
+              <p className="text-3xl font-bold text-slate-800 mt-1">
                 {transferRequests.filter(t => t.requesterId === user.id && t.status === 'Pending').length}
               </p>
             </div>
@@ -364,15 +364,15 @@ export const Dashboard = () => {
 
           {/* Quick Actions */}
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Employee Self Services</h3>
+            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Employee Self Services</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <button onClick={() => navigate('/resource-booking?openBook=true')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/resource-booking?openBook=true')} className="flex items-center justify-center gap-2 bg-blue-650 hover:bg-blue-750 text-white font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Calendar className="w-4 h-4" /> Book Room / Vehicle
               </button>
-              <button onClick={() => navigate('/maintenance?openRequest=true')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/maintenance?openRequest=true')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Wrench className="w-4 h-4 text-slate-400" /> Raise Maintenance Issue
               </button>
-              <button onClick={() => navigate('/assets')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-3.5 px-4 rounded-xl cursor-pointer">
+              <button onClick={() => navigate('/assets')} className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-sm py-3.5 px-4 rounded-xl cursor-pointer">
                 <Package className="w-4 h-4 text-slate-400" /> View My Assets
               </button>
             </div>
@@ -387,10 +387,10 @@ export const Dashboard = () => {
         {/* Recent Activities timeline */}
         <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[420px]">
           <div className="flex items-center justify-between mb-4 shrink-0 border-b border-slate-100 pb-3">
-            <h3 className="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
               <History className="w-5 h-5 text-slate-450" /> System-Wide Activity Log
             </h3>
-            <span className="text-xs text-slate-400 font-medium">Logged in real-time</span>
+            <span className="text-sm text-slate-400 font-medium">Logged in real-time</span>
           </div>
 
           <div className="flex-1 overflow-y-auto pr-2 space-y-4">
@@ -404,11 +404,11 @@ export const Dashboard = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold text-slate-800 truncate">{h.title}</p>
-                    <span className="text-[10px] text-slate-400 font-bold shrink-0">{h.date}</span>
+                    <p className="text-sm font-semibold text-slate-800 truncate">{h.title}</p>
+                    <span className="text-xs text-slate-400 font-bold shrink-0">{h.date}</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">{h.notes}</p>
-                  <p className="text-[10px] text-slate-450 font-bold mt-0.5">Authorised by: {h.user}</p>
+                  <p className="text-xs text-slate-500 mt-0.5">{h.notes}</p>
+                  <p className="text-[11.5px] text-slate-450 font-bold mt-0.5">Authorised by: {h.user}</p>
                 </div>
               </div>
             ))}
@@ -418,27 +418,27 @@ export const Dashboard = () => {
         {/* Calendar Scheduler mini widget */}
         <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col h-[420px]">
           <div className="flex items-center justify-between mb-4 shrink-0 border-b border-slate-100 pb-3">
-            <h3 className="text-base font-bold text-slate-800 tracking-tight flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 tracking-tight flex items-center gap-2">
               <Calendar className="w-5 h-5 text-slate-450" /> Resources Schedule
             </h3>
-            <Link to="/resource-booking" className="text-xs text-blue-600 font-semibold hover:underline">
+            <Link to="/resource-booking" className="text-sm text-blue-600 font-semibold hover:underline">
               View Calendar
             </Link>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3.5 pr-2">
             {bookings.slice(0, 4).map((b, idx) => (
-              <div key={idx} className="p-3 border border-slate-100 rounded-xl bg-slate-50/50 flex flex-col gap-1 text-xs">
+              <div key={idx} className="p-3 border border-slate-100 rounded-xl bg-slate-50/50 flex flex-col gap-1 text-sm">
                 <div className="flex items-center justify-between font-bold text-slate-800">
                   <span className="truncate">{b.assetName}</span>
-                  <span className="text-blue-600 text-[10px] shrink-0">
+                  <span className="text-blue-600 text-xs shrink-0">
                     {b.startTime.split('T')[1]} - {b.endTime.split('T')[1]}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 leading-tight">Purpose: {b.purpose}</p>
-                <div className="flex items-center justify-between text-[10px] text-slate-400 font-semibold pt-1 border-t border-slate-100/50 mt-1">
+                <p className="text-xs text-slate-500 leading-tight">Purpose: {b.purpose}</p>
+                <div className="flex items-center justify-between text-xs text-slate-400 font-semibold pt-1 border-t border-slate-100/50 mt-1">
                   <span>Reserved: {b.employeeName}</span>
-                  <span className={`px-2 py-0.5 rounded font-bold uppercase text-[8px] ${
+                  <span className={`px-2 py-0.5 rounded font-bold uppercase text-[9.5px] ${
                     b.status === 'Approved' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
                   }`}>
                     {b.status}
