@@ -8,6 +8,9 @@ import { Toaster } from 'react-hot-toast';
 import Dashboard from './pages/Dashboard';
 import Allocation from './pages/Allocation';
 import AllocationRequests from './pages/AllocationRequests';
+import Assets from "./pages/Assets";
+import AssetDetails from "./pages/AssetDetails";
+
 const ProtectedRoute = ({ children }) => {
   const { user } = useApp();
 
@@ -37,7 +40,8 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
            <Route path="allocation" element={<Allocation />} />
             <Route path="allocation-requests" element={<AllocationRequests />} />
-           
+            <Route path="assets" element={<Assets />}/>
+            <Route path="assets" element={<AssetDetails />} />           
         </Routes>
       </BrowserRouter>
 
