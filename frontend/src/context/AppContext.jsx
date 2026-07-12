@@ -308,10 +308,10 @@ export const AppProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const res = await api.post('/auth/login', { email, password });
-      const mappedUser = mapUser(res.user);
+      const mappedUser = mapUser(res.data.user);
       setUser(mappedUser);
-      localStorage.setItem('af_accessToken', res.tokens.accessToken);
-      localStorage.setItem('af_refreshToken', res.tokens.refreshToken);
+      localStorage.setItem('af_accessToken', res.data.tokens.accessToken);
+      localStorage.setItem('af_refreshToken', res.data.tokens.refreshToken);
       return { success: true, user: mappedUser };
     } catch (err) {
       return { success: false, message: err.message };
