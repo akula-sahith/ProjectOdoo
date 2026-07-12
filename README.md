@@ -13,4 +13,4 @@ The platform aims to help organizations efficiently manage assets, track resourc
 | Sahith Akula | Solution Architect and Backend Engineer |
 | Pandu Ranga |  |
 | Manoj Kumar |  |
-| Ratnakar |  |
+| Ratnakar |  | Frontend Engineer
