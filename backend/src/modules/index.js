@@ -8,7 +8,7 @@ const transferRoutes = require('./transfer/routes');
 const bookingRoutes = require('./booking/routes');
 const maintenanceRoutes = require('./maintenance/routes');
 const auditRoutes = require('./audit/routes');
-const dashboardRoutes = require('./dashboard/routes');
+const dashboardRoutes = require('./dashboard/dashboard.routes');
 const notificationsRoutes = require('./notifications/routes');
 const reportsRoutes = require('./reports/routes');
 
