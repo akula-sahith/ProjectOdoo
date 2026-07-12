@@ -33,6 +33,9 @@ function App() {
             }
           ></Route>
           <Route path="dashboard" element={<Dashboard />} />
+           <Route path="allocation" element={<Allocation />} />
+            <Route path="allocation-requests" element={<AllocationRequests />} />
+           
         </Routes>
       </BrowserRouter>
 
