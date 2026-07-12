@@ -46,17 +46,14 @@ export const Login = () => {
 
   const onSubmit = async (data) => {
     setLoading(true);
-    // Simulate API call delay
-    setTimeout(() => {
-      const res = login(data.email, data.password);
-      setLoading(false);
-      if (res.success) {
-        toast.success(`Welcome back, ${res.user.name}!`);
-        navigate('/dashboard');
-      } else {
-        toast.error(res.message);
-      }
-    }, 800);
+    const res = await login(data.email, data.password);
+    setLoading(false);
+    if (res.success) {
+      toast.success(`Welcome back, ${res.user.name}!`);
+      navigate('/dashboard');
+    } else {
+      toast.error(res.message || 'Authentication failed');
+    }
   };
 
   const handleQuickLogin = (email) => {
