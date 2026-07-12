@@ -5,7 +5,7 @@ import Login from './pages/Login';
 import { AppProvider, useApp } from './context/AppContext';
 import DashboardLayout from './layout/DashboardLayout';
 import { Toaster } from 'react-hot-toast';
-
+import Dashboard from './pages/Dashboard';
 const ProtectedRoute = ({ children }) => {
   const { user } = useApp();
 
@@ -32,6 +32,7 @@ function App() {
               </ProtectedRoute>
             }
           ></Route>
+          <Route path="dashboard" element={<Dashboard />} />
         </Routes>
       </BrowserRouter>
 
