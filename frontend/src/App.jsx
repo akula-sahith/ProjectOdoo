@@ -12,6 +12,8 @@ import Assets from "./pages/Assets";
 import AssetDetails from "./pages/AssetDetails";
 import Notifications from './pages/Notifications';
 import Maintenance from './pages/Maintenance';
+import Audit from './pages/Audit';
+import Reports from "./pages/Reports";
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useApp();
@@ -45,8 +47,8 @@ function App() {
             <Route path="assets" element={<Assets />}/>
             <Route path="assets" element={<AssetDetails />} />    
              <Route path="maintenance" element={<Maintenance />} />
-            {/* <Route path="audit" element={<Audit />} />
-            <Route path="reports" element={<Reports />} /> */}
+            <Route path="audit" element={<Audit />} />
+            <Route path="reports" element={<Reports />} /> 
             <Route path="notifications" element={<Notifications />} />
                   
         </Routes>
