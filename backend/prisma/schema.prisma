@@ -1,0 +1,407 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ActiveStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum UserRole {
+  ADMIN
+  ASSET_MANAGER
+  DEPARTMENT_HEAD
+  EMPLOYEE
+}
+
+enum AssetCondition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}
+
+enum AssetStatus {
+  AVAILABLE
+  ALLOCATED
+  RESERVED
+  UNDER_MAINTENANCE
+  LOST
+  RETIRED
+  DISPOSED
+}
+
+enum AllocationStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}
+
+enum TransferStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  TRANSFERRED
+  COMPLETED
+}
+
+enum BookingStatus {
+  UPCOMING
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum MaintenancePriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum MaintenanceStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  TECHNICIAN_ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum AuditCycleStatus {
+  SCHEDULED
+  IN_PROGRESS
+  CLOSED
+}
+
+enum VerificationStatus {
+  VERIFIED
+  MISSING
+  DAMAGED
+}
+
+enum NotificationType {
+  ASSET_ASSIGNED
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  BOOKING_REMINDER
+  MAINTENANCE_APPROVED
+  MAINTENANCE_REJECTED
+  TRANSFER_APPROVED
+  OVERDUE_RETURN
+  AUDIT_DISCREPANCY
+}
+
+model Role {
+  role_id     Int      @id @default(autoincrement()) @map("role_id")
+  role_name   UserRole @unique @map("role_name")
+  description String?  @map("description") @db.Text
+  users       User[]
+
+  @@map("roles")
+}
+
+model Department {
+  department_id        Int               @id @default(autoincrement()) @map("department_id")
+  department_name      String            @unique @map("department_name") @db.VarChar(150)
+  parent_department_id Int?              @map("parent_department_id")
+  department_head_id   Int?              @unique @map("department_head_id")
+  status               ActiveStatus      @default(ACTIVE) @map("status")
+  created_at           DateTime          @default(now()) @map("created_at") @db.Timestamp
+
+  parentDepartment     Department?       @relation("DepartmentHierarchy", fields: [parent_department_id], references: [department_id])
+  subDepartments       Department[]      @relation("DepartmentHierarchy")
+  
+  departmentHead       User?             @relation("DepartmentHead", fields: [department_head_id], references: [user_id])
+  users                User[]            @relation("DepartmentUsers")
+  bookings             ResourceBooking[]
+  auditCycles          AuditCycle[]
+
+  @@index([parent_department_id])
+  @@index([department_head_id])
+  @@map("departments")
+}
+
+model User {
+  user_id                     Int                  @id @default(autoincrement()) @map("user_id")
+  employee_code               String               @unique @map("employee_code") @db.VarChar(30)
+  full_name                   String               @map("full_name") @db.VarChar(150)
+  email                       String               @unique @map("email") @db.VarChar(150)
+  password_hash               String               @map("password_hash") @db.Text
+  department_id               Int?                 @map("department_id")
+  role_id                     Int                  @map("role_id")
+  status                      ActiveStatus         @default(ACTIVE) @map("status")
+  created_at                  DateTime             @default(now()) @map("created_at") @db.Timestamp
+  updated_at                  DateTime             @default(now()) @updatedAt @map("updated_at") @db.Timestamp
+
+  department                  Department?          @relation("DepartmentUsers", fields: [department_id], references: [department_id])
+  role                        Role                 @relation(fields: [role_id], references: [role_id])
+  
+  headedDepartment            Department?          @relation("DepartmentHead")
+  sessions                    Session[]
+  createdAssets               Asset[]              @relation("AssetCreator")
+  
+  allocationsTo               AssetAllocation[]    @relation("AllocatedToEmployee")
+  allocationsBy               AssetAllocation[]    @relation("AllocatedByEmployee")
+  
+  transfersFrom               AssetTransfer[]      @relation("TransferFromEmployee")
+  transfersTo                 AssetTransfer[]      @relation("TransferToEmployee")
+  transfersRequested          AssetTransfer[]      @relation("TransferRequestedBy")
+  transfersApproved           AssetTransfer[]      @relation("TransferApprovedBy")
+  
+  bookings                    ResourceBooking[]
+  maintenanceRequestsRaised   MaintenanceRequest[] @relation("MaintenanceRaisedBy")
+  maintenanceRequestsApproved MaintenanceRequest[] @relation("MaintenanceApprovedBy")
+  
+  createdAuditCycles          AuditCycle[]
+  auditedCycles               AuditCycleAuditor[]
+  auditRecords                AuditRecord[]
+  notifications               Notification[]
+  activityLogs                ActivityLog[]
+
+  @@index([department_id])
+  @@index([role_id])
+  @@map("users")
+}
+
+model AssetCategory {
+  category_id     Int          @id @default(autoincrement()) @map("category_id")
+  category_name   String       @unique @map("category_name") @db.VarChar(100)
+  description     String?      @map("description") @db.Text
+  warranty_period Int?         @map("warranty_period")
+  status          ActiveStatus @default(ACTIVE) @map("status")
+  assets          Asset[]
+
+  @@map("asset_categories")
+}
+
+model Session {
+  session_id String   @id @default(uuid()) @map("session_id") @db.Uuid
+  user_id    Int      @map("user_id")
+  token_hash String   @map("token_hash") @db.Text
+  created_at DateTime @default(now()) @map("created_at") @db.Timestamp
+  expires_at DateTime @map("expires_at") @db.Timestamp
+  revoked    Boolean  @default(false) @map("revoked")
+  
+  user       User     @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
+  @@map("sessions")
+}
+
+model Asset {
+  asset_id      Int            @id @default(autoincrement()) @map("asset_id")
+  asset_tag     String         @unique @map("asset_tag") @db.VarChar(30)
+  asset_name    String         @map("asset_name") @db.VarChar(150)
+  serial_number String         @unique @map("serial_number") @db.VarChar(100)
+  category_id   Int            @map("category_id")
+  purchase_date DateTime?      @map("purchase_date") @db.Date
+  purchase_cost Decimal?       @map("purchase_cost") @db.Decimal(10, 2)
+  condition     AssetCondition @map("condition")
+  status        AssetStatus    @map("status")
+  location      String?        @map("location") @db.VarChar(150)
+  is_bookable   Boolean        @default(false) @map("is_bookable")
+  photo_url     String?        @map("photo_url") @db.Text
+  created_by    Int?           @map("created_by")
+  created_at    DateTime       @default(now()) @map("created_at") @db.Timestamp
+
+  category      AssetCategory  @relation(fields: [category_id], references: [category_id])
+  creator       User?          @relation("AssetCreator", fields: [created_by], references: [user_id])
+  
+  allocations   AssetAllocation[]
+  transfers     AssetTransfer[]  @relation("AssetTransfers")
+  bookings      ResourceBooking[]
+  maintenance   MaintenanceRequest[]
+  auditRecords  AuditRecord[]
+
+  @@index([category_id])
+  @@index([created_by])
+  @@index([status])
+  @@map("assets")
+}
+
+model AssetAllocation {
+  allocation_id        Int              @id @default(autoincrement()) @map("allocation_id")
+  asset_id             Int              @map("asset_id")
+  employee_id          Int              @map("employee_id")
+  allocated_by         Int              @map("allocated_by")
+  allocation_date      DateTime         @default(now()) @map("allocation_date") @db.Date
+  expected_return_date DateTime?        @map("expected_return_date") @db.Date
+  actual_return_date   DateTime?        @map("actual_return_date") @db.Date
+  status               AllocationStatus @map("status")
+  checkin_notes        String?          @map("checkin_notes") @db.Text
+
+  asset                Asset            @relation(fields: [asset_id], references: [asset_id])
+  employee             User             @relation("AllocatedToEmployee", fields: [employee_id], references: [user_id])
+  allocator            User             @relation("AllocatedByEmployee", fields: [allocated_by], references: [user_id])
+
+  @@index([asset_id])
+  @@index([employee_id])
+  @@index([allocated_by])
+  @@index([status])
+  @@map("asset_allocations")
+}
+
+model AssetTransfer {
+  transfer_id   Int            @id @default(autoincrement()) @map("transfer_id")
+  asset_id      Int            @map("asset_id")
+  from_employee Int?           @map("from_employee")
+  to_employee   Int            @map("to_employee")
+  requested_by  Int            @map("requested_by")
+  approved_by   Int?           @map("approved_by")
+  status        TransferStatus @map("status")
+  requested_at  DateTime       @default(now()) @map("requested_at") @db.Timestamp
+  approved_at   DateTime?      @map("approved_at") @db.Timestamp
+
+  asset         Asset          @relation("AssetTransfers", fields: [asset_id], references: [asset_id])
+  fromEmployee  User?          @relation("TransferFromEmployee", fields: [from_employee], references: [user_id])
+  toEmployee    User           @relation("TransferToEmployee", fields: [to_employee], references: [user_id])
+  requester     User           @relation("TransferRequestedBy", fields: [requested_by], references: [user_id])
+  approver      User?          @relation("TransferApprovedBy", fields: [approved_by], references: [user_id])
+
+  @@index([asset_id])
+  @@index([from_employee])
+  @@index([to_employee])
+  @@index([status])
+  @@map("asset_transfers")
+}
+
+model ResourceBooking {
+  booking_id    Int           @id @default(autoincrement()) @map("booking_id")
+  asset_id      Int           @map("asset_id")
+  employee_id   Int           @map("employee_id")
+  department_id Int?          @map("department_id")
+  start_time    DateTime      @map("start_time") @db.Timestamp
+  end_time      DateTime      @map("end_time") @db.Timestamp
+  status        BookingStatus @map("status")
+  created_at    DateTime      @default(now()) @map("created_at") @db.Timestamp
+
+  asset         Asset         @relation(fields: [asset_id], references: [asset_id])
+  employee      User          @relation(fields: [employee_id], references: [user_id])
+  department    Department?   @relation(fields: [department_id], references: [department_id])
+
+  @@index([asset_id])
+  @@index([employee_id])
+  @@index([department_id])
+  @@index([start_time, end_time])
+  @@map("resource_bookings")
+}
+
+model MaintenanceRequest {
+  maintenance_id    Int                 @id @default(autoincrement()) @map("maintenance_id")
+  asset_id          Int                 @map("asset_id")
+  raised_by         Int                 @map("raised_by")
+  approved_by       Int?                @map("approved_by")
+  priority          MaintenancePriority @map("priority")
+  issue_description String              @map("issue_description") @db.Text
+  photo_url         String?             @map("photo_url") @db.Text
+  status            MaintenanceStatus   @map("status")
+  technician_name   String?             @map("technician_name") @db.VarChar(150)
+  started_at        DateTime?           @map("started_at") @db.Timestamp
+  completed_at      DateTime?           @map("completed_at") @db.Timestamp
+
+  asset             Asset               @relation(fields: [asset_id], references: [asset_id])
+  raisedByUser      User                @relation("MaintenanceRaisedBy", fields: [raised_by], references: [user_id])
+  approvedByUser    User?               @relation("MaintenanceApprovedBy", fields: [approved_by], references: [user_id])
+
+  @@index([asset_id])
+  @@index([raised_by])
+  @@index([approved_by])
+  @@index([status])
+  @@map("maintenance_requests")
+}
+
+model AuditCycle {
+  audit_cycle_id Int              @id @default(autoincrement()) @map("audit_cycle_id")
+  audit_name     String           @map("audit_name") @db.VarChar(150)
+  department_id  Int?             @map("department_id")
+  start_date     DateTime         @map("start_date") @db.Date
+  end_date       DateTime         @map("end_date") @db.Date
+  created_by     Int              @map("created_by")
+  status         AuditCycleStatus @map("status")
+
+  department     Department?      @relation(fields: [department_id], references: [department_id])
+  creator        User             @relation(fields: [created_by], references: [user_id])
+  
+  auditors       AuditCycleAuditor[]
+  records        AuditRecord[]
+
+  @@index([department_id])
+  @@index([created_by])
+  @@index([status])
+  @@map("audit_cycles")
+}
+
+model AuditCycleAuditor {
+  audit_cycle_id Int @map("audit_cycle_id")
+  auditor_id     Int @map("auditor_id")
+
+  auditCycle     AuditCycle @relation(fields: [audit_cycle_id], references: [audit_cycle_id])
+  auditor        User       @relation(fields: [auditor_id], references: [user_id])
+
+  @@id([audit_cycle_id, auditor_id])
+  @@map("audit_cycle_auditors")
+}
+
+model AuditRecord {
+  record_id           Int                @id @default(autoincrement()) @map("record_id")
+  audit_cycle_id      Int                @map("audit_cycle_id")
+  asset_id            Int                @map("asset_id")
+  auditor_id          Int                @map("auditor_id")
+  verification_status VerificationStatus @map("verification_status")
+  remarks             String?            @map("remarks") @db.Text
+  verified_at         DateTime           @default(now()) @map("verified_at") @db.Timestamp
+
+  auditCycle          AuditCycle         @relation(fields: [audit_cycle_id], references: [audit_cycle_id])
+  asset               Asset              @relation(fields: [asset_id], references: [asset_id])
+  auditor             User               @relation(fields: [auditor_id], references: [user_id])
+
+  @@unique([audit_cycle_id, asset_id])
+  @@index([audit_cycle_id])
+  @@index([asset_id])
+  @@index([auditor_id])
+  @@map("audit_records")
+}
+
+model Notification {
+  notification_id   Int              @id @default(autoincrement()) @map("notification_id")
+  user_id           Int              @map("user_id")
+  title             String           @map("title") @db.VarChar(200)
+  message           String           @map("message") @db.Text
+  notification_type NotificationType @map("notification_type")
+  is_read           Boolean          @default(false) @map("is_read")
+  created_at        DateTime         @default(now()) @map("created_at") @db.Timestamp
+
+  user              User             @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
+  @@index([is_read])
+  @@map("notifications")
+}
+
+model ActivityLog {
+  log_id    BigInt   @id @default(autoincrement()) @map("log_id")
+  user_id   Int?     @map("user_id")
+  action    String   @map("action") @db.VarChar(150)
+  module    String   @map("module") @db.VarChar(50)
+  entity_id Int      @map("entity_id")
+  old_value Json?    @map("old_value")
+  new_value Json?    @map("new_value")
+  timestamp DateTime @default(now()) @map("timestamp") @db.Timestamp
+
+  user      User?    @relation(fields: [user_id], references: [user_id])
+
+  @@index([user_id])
+  @@index([module])
+  @@index([entity_id])
+  @@map("activity_logs")
+}
