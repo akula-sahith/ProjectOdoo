@@ -1,4 +1,8 @@
 const prisma = require('../../config/db');
+const transferRepository = require('../../repositories/transferRepository');
+const assetRepository = require('../../repositories/assetRepository');
+const allocationRepository = require('../../repositories/allocationRepository');
+const activityLogRepository = require('../../repositories/activityLogRepository');
 
 const createTransfer = async (data, requestedByUserId) => {
   const assetId = Number(data.asset_id);
@@ -6,18 +10,16 @@ const createTransfer = async (data, requestedByUserId) => {
   let fromEmployee = data.from_employee ? Number(data.from_employee) : null;
 
   // 1. Verify asset exists
-  const asset = await prisma.asset.findUnique({
-    where: { asset_id: assetId },
-  });
-
+  const asset = await assetRepository.findById(assetId);
   if (!asset) {
     throw new Error('Asset not found');
   }
 
   // 2. Determine from_employee if not provided
   if (!fromEmployee) {
-    const activeAlloc = await prisma.assetAllocation.findFirst({
-      where: { asset_id: assetId, status: 'ACTIVE' },
+    const activeAlloc = await allocationRepository.findFirst({
+      asset_id: assetId,
+      status: 'ACTIVE'
     });
     if (activeAlloc) {
       fromEmployee = activeAlloc.employee_id;
@@ -30,20 +32,12 @@ const createTransfer = async (data, requestedByUserId) => {
   }
 
   // 4. Create the transfer request
-  return await prisma.assetTransfer.create({
-    data: {
-      asset_id: assetId,
-      from_employee: fromEmployee,
-      to_employee: toEmployee,
-      requested_by: requestedByUserId,
-      status: 'REQUESTED',
-    },
-    include: {
-      asset: true,
-      fromEmployee: true,
-      toEmployee: true,
-      requester: true,
-    },
+  return await transferRepository.create({
+    asset_id: assetId,
+    from_employee: fromEmployee,
+    to_employee: toEmployee,
+    requested_by: requestedByUserId,
+    status: 'REQUESTED',
   });
 };
 
@@ -56,39 +50,15 @@ const getTransfers = async (filters = {}) => {
     where.asset_id = Number(filters.asset_id);
   }
 
-  return await prisma.assetTransfer.findMany({
-    where,
-    include: {
-      asset: true,
-      fromEmployee: true,
-      toEmployee: true,
-      requester: true,
-      approver: true,
-    },
-    orderBy: {
-      requested_at: 'desc',
-    },
-  });
+  return await transferRepository.findMany(where);
 };
 
 const getTransferById = async (id) => {
-  return await prisma.assetTransfer.findUnique({
-    where: { transfer_id: Number(id) },
-    include: {
-      asset: true,
-      fromEmployee: true,
-      toEmployee: true,
-      requester: true,
-      approver: true,
-    },
-  });
+  return await transferRepository.findById(id);
 };
 
 const approveTransfer = async (id, approvedByUserId) => {
-  const transfer = await prisma.assetTransfer.findUnique({
-    where: { transfer_id: Number(id) },
-  });
-
+  const transfer = await transferRepository.findById(id);
   if (!transfer) {
     throw new Error('Transfer request not found');
   }
@@ -97,25 +67,15 @@ const approveTransfer = async (id, approvedByUserId) => {
     throw new Error(`Cannot approve a transfer with status: ${transfer.status}`);
   }
 
-  return await prisma.assetTransfer.update({
-    where: { transfer_id: Number(id) },
-    data: {
-      status: 'APPROVED',
-      approved_by: approvedByUserId,
-      approved_at: new Date(),
-    },
-    include: {
-      asset: true,
-      toEmployee: true,
-    },
+  return await transferRepository.update(id, {
+    status: 'APPROVED',
+    approved_by: approvedByUserId,
+    approved_at: new Date(),
   });
 };
 
 const rejectTransfer = async (id, approvedByUserId) => {
-  const transfer = await prisma.assetTransfer.findUnique({
-    where: { transfer_id: Number(id) },
-  });
-
+  const transfer = await transferRepository.findById(id);
   if (!transfer) {
     throw new Error('Transfer request not found');
   }
@@ -124,22 +84,15 @@ const rejectTransfer = async (id, approvedByUserId) => {
     throw new Error(`Cannot reject a transfer with status: ${transfer.status}`);
   }
 
-  return await prisma.assetTransfer.update({
-    where: { transfer_id: Number(id) },
-    data: {
-      status: 'REJECTED',
-      approved_by: approvedByUserId,
-      approved_at: new Date(),
-    },
+  return await transferRepository.update(id, {
+    status: 'REJECTED',
+    approved_by: approvedByUserId,
+    approved_at: new Date(),
   });
 };
 
 const completeTransfer = async (id, completedByUserId) => {
-  const transfer = await prisma.assetTransfer.findUnique({
-    where: { transfer_id: Number(id) },
-    include: { asset: true },
-  });
-
+  const transfer = await transferRepository.findById(id);
   if (!transfer) {
     throw new Error('Transfer request not found');
   }
@@ -150,62 +103,42 @@ const completeTransfer = async (id, completedByUserId) => {
 
   return await prisma.$transaction(async (tx) => {
     // 1. Mark previous active allocation for this asset as RETURNED
-    await tx.assetAllocation.updateMany({
-      where: {
-        asset_id: transfer.asset_id,
-        status: 'ACTIVE',
-      },
-      data: {
-        status: 'RETURNED',
-        actual_return_date: new Date(),
-        checkin_notes: `Returned via transfer ID ${transfer.transfer_id}`,
-      },
-    });
+    await allocationRepository.updateMany({
+      asset_id: transfer.asset_id,
+      status: 'ACTIVE',
+    }, {
+      status: 'RETURNED',
+      actual_return_date: new Date(),
+      checkin_notes: `Returned via transfer ID ${transfer.transfer_id}`,
+    }, tx);
 
     // 2. Create new active allocation for target user
-    const newAllocation = await tx.assetAllocation.create({
-      data: {
-        asset_id: transfer.asset_id,
-        employee_id: transfer.to_employee,
-        allocated_by: completedByUserId || transfer.approved_by || transfer.requested_by,
-        allocation_date: new Date(),
-        status: 'ACTIVE',
-      },
-      include: {
-        employee: true,
-      },
-    });
+    const newAllocation = await allocationRepository.create({
+      asset_id: transfer.asset_id,
+      employee_id: transfer.to_employee,
+      allocated_by: completedByUserId || transfer.approved_by || transfer.requested_by,
+      allocation_date: new Date(),
+      status: 'ACTIVE',
+    }, tx);
 
     // 3. Ensure asset status is set to ALLOCATED
-    await tx.asset.update({
-      where: { asset_id: transfer.asset_id },
-      data: { status: 'ALLOCATED' },
-    });
+    await assetRepository.update(transfer.asset_id, { status: 'ALLOCATED' }, tx);
 
     // 4. Update the transfer status to COMPLETED
-    const updatedTransfer = await tx.assetTransfer.update({
-      where: { transfer_id: Number(id) },
-      data: {
-        status: 'COMPLETED',
-        approved_by: completedByUserId || transfer.approved_by,
-        approved_at: transfer.approved_at || new Date(),
-      },
-      include: {
-        asset: true,
-        toEmployee: true,
-      },
-    });
+    const updatedTransfer = await transferRepository.update(id, {
+      status: 'COMPLETED',
+      approved_by: completedByUserId || transfer.approved_by,
+      approved_at: transfer.approved_at || new Date(),
+    }, tx);
 
     // 5. Write to Activity Log
-    await tx.activityLog.create({
-      data: {
-        user_id: completedByUserId || null,
-        action: `Asset '${transfer.asset.asset_name}' transfer completed to ${newAllocation.employee.full_name}`,
-        module: 'ASSET',
-        entity_id: transfer.asset_id,
-        new_value: { transfer_id: transfer.transfer_id },
-      },
-    });
+    await activityLogRepository.create({
+      user_id: completedByUserId || null,
+      action: `Asset '${transfer.asset.asset_name}' transfer completed to ${newAllocation.employee.full_name}`,
+      module: 'ASSET',
+      entity_id: transfer.asset_id,
+      new_value: { transfer_id: transfer.transfer_id },
+    }, tx);
 
     return updatedTransfer;
   });

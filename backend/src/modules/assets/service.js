@@ -1,32 +1,22 @@
-const prisma = require('../../config/db');
+const categoryRepository = require('../../repositories/categoryRepository');
+const assetRepository = require('../../repositories/assetRepository');
 
 // Asset Category Services
 const createCategory = async (data) => {
-  return await prisma.assetCategory.create({
-    data: {
-      category_name: data.category_name,
-      description: data.description,
-      warranty_period: data.warranty_period ? Number(data.warranty_period) : null,
-      status: data.status || 'ACTIVE',
-    },
+  return await categoryRepository.create({
+    category_name: data.category_name,
+    description: data.description,
+    warranty_period: data.warranty_period ? Number(data.warranty_period) : null,
+    status: data.status || 'ACTIVE',
   });
 };
 
 const getCategories = async () => {
-  return await prisma.assetCategory.findMany({
-    include: {
-      _count: {
-        select: { assets: true },
-      },
-    },
-  });
+  return await categoryRepository.findMany();
 };
 
 const getCategoryById = async (id) => {
-  return await prisma.assetCategory.findUnique({
-    where: { category_id: Number(id) },
-    include: { assets: true },
-  });
+  return await categoryRepository.findById(id);
 };
 
 const updateCategory = async (id, data) => {
@@ -38,16 +28,11 @@ const updateCategory = async (id, data) => {
     payload.warranty_period = data.warranty_period ? Number(data.warranty_period) : null;
   }
 
-  return await prisma.assetCategory.update({
-    where: { category_id: Number(id) },
-    data: payload,
-  });
+  return await categoryRepository.update(id, payload);
 };
 
 const deleteCategory = async (id) => {
-  return await prisma.assetCategory.delete({
-    where: { category_id: Number(id) },
-  });
+  return await categoryRepository.deleteCategory(id);
 };
 
 // Asset Services
@@ -56,11 +41,11 @@ const createAsset = async (data) => {
   if (!assetTag) {
     let tagExists = true;
     let index = 1;
-    const count = await prisma.asset.count();
+    const count = await assetRepository.count();
     index = count + 1;
     while (tagExists) {
       assetTag = `AF-${String(index).padStart(4, '0')}`;
-      const existing = await prisma.asset.findUnique({ where: { asset_tag: assetTag } });
+      const existing = await assetRepository.findUnique({ where: { asset_tag: assetTag } });
       if (!existing) {
         tagExists = false;
       } else {
@@ -91,13 +76,7 @@ const createAsset = async (data) => {
     payload.created_by = Number(data.created_by);
   }
 
-  return await prisma.asset.create({
-    data: payload,
-    include: {
-      category: true,
-      creator: true,
-    },
-  });
+  return await assetRepository.create(payload);
 };
 
 const getAssets = async (filters = {}) => {
@@ -122,32 +101,11 @@ const getAssets = async (filters = {}) => {
     ];
   }
 
-  return await prisma.asset.findMany({
-    where,
-    include: {
-      category: true,
-      creator: true,
-    },
-  });
+  return await assetRepository.findMany(where);
 };
 
 const getAssetById = async (id) => {
-  return await prisma.asset.findUnique({
-    where: { asset_id: Number(id) },
-    include: {
-      category: true,
-      creator: true,
-      allocations: {
-        include: {
-          employee: true,
-          allocator: true
-        }
-      },
-      transfers: true,
-      bookings: true,
-      maintenance: true
-    },
-  });
+  return await assetRepository.findById(id);
 };
 
 const updateAsset = async (id, data) => {
@@ -172,19 +130,11 @@ const updateAsset = async (id, data) => {
     payload.purchase_cost = data.purchase_cost ? Number(data.purchase_cost) : null;
   }
 
-  return await prisma.asset.update({
-    where: { asset_id: Number(id) },
-    data: payload,
-    include: {
-      category: true,
-    },
-  });
+  return await assetRepository.update(id, payload);
 };
 
 const deleteAsset = async (id) => {
-  return await prisma.asset.delete({
-    where: { asset_id: Number(id) },
-  });
+  return await assetRepository.deleteAsset(id);
 };
 
 module.exports = {

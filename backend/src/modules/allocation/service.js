@@ -1,4 +1,7 @@
 const prisma = require('../../config/db');
+const allocationRepository = require('../../repositories/allocationRepository');
+const assetRepository = require('../../repositories/assetRepository');
+const activityLogRepository = require('../../repositories/activityLogRepository');
 
 const createAllocation = async (data) => {
   const assetId = Number(data.asset_id);
@@ -6,10 +9,7 @@ const createAllocation = async (data) => {
   const allocatedById = Number(data.allocated_by);
 
   // 1. Verify asset exists
-  const asset = await prisma.asset.findUnique({
-    where: { asset_id: assetId },
-  });
-
+  const asset = await assetRepository.findById(assetId);
   if (!asset) {
     throw new Error('Asset not found');
   }
@@ -20,11 +20,9 @@ const createAllocation = async (data) => {
   }
 
   // 3. Check for existing active allocation
-  const activeAllocation = await prisma.assetAllocation.findFirst({
-    where: {
-      asset_id: assetId,
-      status: 'ACTIVE',
-    },
+  const activeAllocation = await allocationRepository.findFirst({
+    asset_id: assetId,
+    status: 'ACTIVE',
   });
 
   if (activeAllocation) {
@@ -33,37 +31,25 @@ const createAllocation = async (data) => {
 
   // 4. Create allocation and update asset status in a transaction
   return await prisma.$transaction(async (tx) => {
-    const allocation = await tx.assetAllocation.create({
-      data: {
-        asset_id: assetId,
-        employee_id: employeeId,
-        allocated_by: allocatedById,
-        allocation_date: data.allocation_date ? new Date(data.allocation_date) : new Date(),
-        expected_return_date: data.expected_return_date ? new Date(data.expected_return_date) : null,
-        status: 'ACTIVE',
-      },
-      include: {
-        asset: true,
-        employee: true,
-        allocator: true,
-      },
-    });
+    const allocation = await allocationRepository.create({
+      asset_id: assetId,
+      employee_id: employeeId,
+      allocated_by: allocatedById,
+      allocation_date: data.allocation_date ? new Date(data.allocation_date) : new Date(),
+      expected_return_date: data.expected_return_date ? new Date(data.expected_return_date) : null,
+      status: 'ACTIVE',
+    }, tx);
 
-    await tx.asset.update({
-      where: { asset_id: assetId },
-      data: { status: 'ALLOCATED' },
-    });
+    await assetRepository.update(assetId, { status: 'ALLOCATED' }, tx);
 
     // Write to Activity Log
-    await tx.activityLog.create({
-      data: {
-        user_id: allocatedById,
-        action: `Asset '${asset.asset_name}' allocated to ${allocation.employee.full_name}`,
-        module: 'ASSET',
-        entity_id: assetId,
-        new_value: { allocation_id: allocation.allocation_id },
-      },
-    });
+    await activityLogRepository.create({
+      user_id: allocatedById,
+      action: `Asset '${asset.asset_name}' allocated to ${allocation.employee.full_name}`,
+      module: 'ASSET',
+      entity_id: assetId,
+      new_value: { allocation_id: allocation.allocation_id },
+    }, tx);
 
     return allocation;
   });
@@ -81,36 +67,15 @@ const getAllocations = async (filters = {}) => {
     where.asset_id = Number(filters.asset_id);
   }
 
-  return await prisma.assetAllocation.findMany({
-    where,
-    include: {
-      asset: true,
-      employee: true,
-      allocator: true,
-    },
-    orderBy: {
-      allocation_date: 'desc',
-    },
-  });
+  return await allocationRepository.findMany(where);
 };
 
 const getAllocationById = async (id) => {
-  return await prisma.assetAllocation.findUnique({
-    where: { allocation_id: Number(id) },
-    include: {
-      asset: true,
-      employee: true,
-      allocator: true,
-    },
-  });
+  return await allocationRepository.findById(id);
 };
 
 const returnAsset = async (id, data, returnedByUserId) => {
-  const allocation = await prisma.assetAllocation.findUnique({
-    where: { allocation_id: Number(id) },
-    include: { asset: true },
-  });
-
+  const allocation = await allocationRepository.findById(id);
   if (!allocation) {
     throw new Error('Allocation record not found');
   }
@@ -120,34 +85,22 @@ const returnAsset = async (id, data, returnedByUserId) => {
   }
 
   return await prisma.$transaction(async (tx) => {
-    const updatedAllocation = await tx.assetAllocation.update({
-      where: { allocation_id: Number(id) },
-      data: {
-        status: 'RETURNED',
-        actual_return_date: new Date(),
-        checkin_notes: data.checkin_notes || null,
-      },
-      include: {
-        asset: true,
-        employee: true,
-      },
-    });
+    const updatedAllocation = await allocationRepository.update(id, {
+      status: 'RETURNED',
+      actual_return_date: new Date(),
+      checkin_notes: data.checkin_notes || null,
+    }, tx);
 
-    await tx.asset.update({
-      where: { asset_id: allocation.asset_id },
-      data: { status: 'AVAILABLE' },
-    });
+    await assetRepository.update(allocation.asset_id, { status: 'AVAILABLE' }, tx);
 
     // Write to Activity Log
-    await tx.activityLog.create({
-      data: {
-        user_id: returnedByUserId || null,
-        action: `Asset '${allocation.asset.asset_name}' returned by ${updatedAllocation.employee.full_name}`,
-        module: 'ASSET',
-        entity_id: allocation.asset_id,
-        new_value: { checkin_notes: data.checkin_notes },
-      },
-    });
+    await activityLogRepository.create({
+      user_id: returnedByUserId || null,
+      action: `Asset '${allocation.asset.asset_name}' returned by ${updatedAllocation.employee.full_name}`,
+      module: 'ASSET',
+      entity_id: allocation.asset_id,
+      new_value: { checkin_notes: data.checkin_notes },
+    }, tx);
 
     return updatedAllocation;
   });

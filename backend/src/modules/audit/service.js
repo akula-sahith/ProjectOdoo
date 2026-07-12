@@ -1,4 +1,7 @@
 const prisma = require('../../config/db');
+const auditRepository = require('../../repositories/auditRepository');
+const assetRepository = require('../../repositories/assetRepository');
+const activityLogRepository = require('../../repositories/activityLogRepository');
 
 // Audit Cycle Services
 const createCycle = async (data, createdByUserId) => {
@@ -9,20 +12,14 @@ const createCycle = async (data, createdByUserId) => {
 
   return await prisma.$transaction(async (tx) => {
     // 1. Create Cycle
-    const cycle = await tx.auditCycle.create({
-      data: {
-        audit_name: data.audit_name,
-        department_id: deptId,
-        start_date: startDate,
-        end_date: endDate,
-        created_by: creatorId,
-        status: data.status || 'SCHEDULED',
-      },
-      include: {
-        department: true,
-        creator: true,
-      },
-    });
+    const cycle = await auditRepository.createCycle({
+      audit_name: data.audit_name,
+      department_id: deptId,
+      start_date: startDate,
+      end_date: endDate,
+      created_by: creatorId,
+      status: data.status || 'SCHEDULED',
+    }, tx);
 
     // 2. Add Auditors if provided
     if (data.auditor_ids && data.auditor_ids.length > 0) {
@@ -31,9 +28,7 @@ const createCycle = async (data, createdByUserId) => {
         auditor_id: Number(auditorId),
       }));
 
-      await tx.auditCycleAuditor.createMany({
-        data: auditorRelations,
-      });
+      await auditRepository.createAuditorRelations(auditorRelations, tx);
     }
 
     return cycle;
@@ -49,42 +44,11 @@ const getCycles = async (filters = {}) => {
     where.department_id = Number(filters.department_id);
   }
 
-  return await prisma.auditCycle.findMany({
-    where,
-    include: {
-      department: true,
-      creator: true,
-      auditors: {
-        include: {
-          auditor: true,
-        },
-      },
-    },
-    orderBy: {
-      audit_cycle_id: 'desc',
-    },
-  });
+  return await auditRepository.findCycles(where);
 };
 
 const getCycleById = async (id) => {
-  return await prisma.auditCycle.findUnique({
-    where: { audit_cycle_id: Number(id) },
-    include: {
-      department: true,
-      creator: true,
-      auditors: {
-        include: {
-          auditor: true,
-        },
-      },
-      records: {
-        include: {
-          asset: true,
-          auditor: true,
-        },
-      },
-    },
-  });
+  return await auditRepository.findCycleById(id);
 };
 
 // Audit Record Services
@@ -94,22 +58,14 @@ const createRecord = async (data, auditorUserId) => {
   const auditorId = Number(auditorUserId || data.auditor_id);
 
   // 1. Verify audit cycle and asset exist
-  const cycle = await prisma.auditCycle.findUnique({ where: { audit_cycle_id: cycleId } });
+  const cycle = await auditRepository.findCycleById(cycleId);
   if (!cycle) throw new Error('Audit cycle not found');
 
-  const asset = await prisma.asset.findUnique({ where: { asset_id: assetId } });
+  const asset = await assetRepository.findById(assetId);
   if (!asset) throw new Error('Asset not found');
 
   // 2. Check if already checked in this cycle
-  const existingRecord = await prisma.auditRecord.findUnique({
-    where: {
-      audit_cycle_id_asset_id: {
-        audit_cycle_id: cycleId,
-        asset_id: assetId,
-      },
-    },
-  });
-
+  const existingRecord = await auditRepository.findRecordByUniqueKeys(cycleId, assetId);
   if (existingRecord) {
     throw new Error('This asset has already been audited for this cycle');
   }
@@ -124,39 +80,28 @@ const createRecord = async (data, auditorUserId) => {
 
   return await prisma.$transaction(async (tx) => {
     // A. Create record
-    const record = await tx.auditRecord.create({
-      data: {
-        audit_cycle_id: cycleId,
-        asset_id: assetId,
-        auditor_id: auditorId,
-        verification_status: data.verification_status,
-        remarks: data.remarks || null,
-        verified_at: new Date(),
-      },
-      include: {
-        asset: true,
-        auditor: true,
-      },
-    });
+    const record = await auditRepository.createRecord({
+      audit_cycle_id: cycleId,
+      asset_id: assetId,
+      auditor_id: auditorId,
+      verification_status: data.verification_status,
+      remarks: data.remarks || null,
+      verified_at: new Date(),
+    }, tx);
 
     // B. Update asset if condition/status changes
     if (Object.keys(assetUpdates).length > 0) {
-      await tx.asset.update({
-        where: { asset_id: assetId },
-        data: assetUpdates,
-      });
+      await assetRepository.update(assetId, assetUpdates, tx);
     }
 
     // C. Write to Activity Log
-    await tx.activityLog.create({
-      data: {
-        user_id: auditorId,
-        action: `Asset '${asset.asset_name}' audited in cycle '${cycle.audit_name}' (${data.verification_status})`,
-        module: 'AUDIT',
-        entity_id: assetId,
-        new_value: { record_id: record.record_id, status: data.verification_status },
-      },
-    });
+    await activityLogRepository.create({
+      user_id: auditorId,
+      action: `Asset '${asset.asset_name}' audited in cycle '${cycle.audit_name}' (${data.verification_status})`,
+      module: 'AUDIT',
+      entity_id: assetId,
+      new_value: { record_id: record.record_id, status: data.verification_status },
+    }, tx);
 
     return record;
   });
@@ -171,17 +116,7 @@ const getRecords = async (filters = {}) => {
     where.verification_status = filters.verification_status;
   }
 
-  return await prisma.auditRecord.findMany({
-    where,
-    include: {
-      auditCycle: true,
-      asset: true,
-      auditor: true,
-    },
-    orderBy: {
-      verified_at: 'desc',
-    },
-  });
+  return await auditRepository.findRecords(where);
 };
 
 module.exports = {

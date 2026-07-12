@@ -1,4 +1,7 @@
 const prisma = require('../../config/db');
+const bookingRepository = require('../../repositories/bookingRepository');
+const assetRepository = require('../../repositories/assetRepository');
+const activityLogRepository = require('../../repositories/activityLogRepository');
 
 const createBooking = async (data) => {
   const assetId = Number(data.asset_id);
@@ -8,10 +11,7 @@ const createBooking = async (data) => {
   const endTime = new Date(data.end_time);
 
   // 1. Verify asset exists and is bookable
-  const asset = await prisma.asset.findUnique({
-    where: { asset_id: assetId },
-  });
-
+  const asset = await assetRepository.findById(assetId);
   if (!asset) {
     throw new Error('Asset not found');
   }
@@ -21,13 +21,11 @@ const createBooking = async (data) => {
   }
 
   // 2. Check for overlapping bookings
-  const overlappingBooking = await prisma.resourceBooking.findFirst({
-    where: {
-      asset_id: assetId,
-      status: { not: 'CANCELLED' },
-      start_time: { lt: endTime },
-      end_time: { gt: startTime },
-    },
+  const overlappingBooking = await bookingRepository.findFirst({
+    asset_id: assetId,
+    status: { not: 'CANCELLED' },
+    start_time: { lt: endTime },
+    end_time: { gt: startTime },
   });
 
   if (overlappingBooking) {
@@ -35,20 +33,13 @@ const createBooking = async (data) => {
   }
 
   // 3. Create the booking
-  return await prisma.resourceBooking.create({
-    data: {
-      asset_id: assetId,
-      employee_id: employeeId,
-      department_id: deptId,
-      start_time: startTime,
-      end_time: endTime,
-      status: 'UPCOMING',
-    },
-    include: {
-      asset: true,
-      employee: true,
-      department: true,
-    },
+  return await bookingRepository.create({
+    asset_id: assetId,
+    employee_id: employeeId,
+    department_id: deptId,
+    start_time: startTime,
+    end_time: endTime,
+    status: 'UPCOMING',
   });
 };
 
@@ -64,36 +55,15 @@ const getBookings = async (filters = {}) => {
     where.employee_id = Number(filters.employee_id);
   }
 
-  return await prisma.resourceBooking.findMany({
-    where,
-    include: {
-      asset: true,
-      employee: true,
-      department: true,
-    },
-    orderBy: {
-      start_time: 'asc',
-    },
-  });
+  return await bookingRepository.findMany(where);
 };
 
 const getBookingById = async (id) => {
-  return await prisma.resourceBooking.findUnique({
-    where: { booking_id: Number(id) },
-    include: {
-      asset: true,
-      employee: true,
-      department: true,
-    },
-  });
+  return await bookingRepository.findById(id);
 };
 
 const cancelBooking = async (id, cancelledByUserId) => {
-  const booking = await prisma.resourceBooking.findUnique({
-    where: { booking_id: Number(id) },
-    include: { asset: true },
-  });
-
+  const booking = await bookingRepository.findById(id);
   if (!booking) {
     throw new Error('Booking not found');
   }
@@ -103,25 +73,18 @@ const cancelBooking = async (id, cancelledByUserId) => {
   }
 
   return await prisma.$transaction(async (tx) => {
-    const updated = await tx.resourceBooking.update({
-      where: { booking_id: Number(id) },
-      data: { status: 'CANCELLED' },
-      include: {
-        asset: true,
-        employee: true,
-      },
-    });
+    const updated = await bookingRepository.update(id, {
+      status: 'CANCELLED'
+    }, tx);
 
     // Write to Activity Log
-    await tx.activityLog.create({
-      data: {
-        user_id: cancelledByUserId || null,
-        action: `Booking for asset '${booking.asset.asset_name}' was cancelled`,
-        module: 'BOOKING',
-        entity_id: booking.asset_id,
-        new_value: { booking_id: booking.booking_id },
-      },
-    });
+    await activityLogRepository.create({
+      user_id: cancelledByUserId || null,
+      action: `Booking for asset '${booking.asset.asset_name}' was cancelled`,
+      module: 'BOOKING',
+      entity_id: booking.asset_id,
+      new_value: { booking_id: booking.booking_id },
+    }, tx);
 
     return updated;
   });

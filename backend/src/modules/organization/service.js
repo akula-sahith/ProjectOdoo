@@ -1,4 +1,6 @@
-const prisma = require('../../config/db');
+const departmentRepository = require('../../repositories/departmentRepository');
+const roleRepository = require('../../repositories/roleRepository');
+const userRepository = require('../../repositories/userRepository');
 const bcrypt = require('bcrypt');
 
 // Departments Services
@@ -16,35 +18,15 @@ const createDepartment = async (data) => {
     payload.department_head_id = Number(data.department_head_id);
   }
 
-  return await prisma.department.create({
-    data: payload,
-    include: {
-      parentDepartment: true,
-      departmentHead: true,
-    },
-  });
+  return await departmentRepository.create(payload);
 };
 
 const getDepartments = async () => {
-  return await prisma.department.findMany({
-    include: {
-      parentDepartment: true,
-      departmentHead: true,
-      subDepartments: true,
-    },
-  });
+  return await departmentRepository.findMany();
 };
 
 const getDepartmentById = async (id) => {
-  return await prisma.department.findUnique({
-    where: { department_id: Number(id) },
-    include: {
-      parentDepartment: true,
-      departmentHead: true,
-      subDepartments: true,
-      users: true,
-    },
-  });
+  return await departmentRepository.findById(id);
 };
 
 const updateDepartment = async (id, data) => {
@@ -60,25 +42,16 @@ const updateDepartment = async (id, data) => {
     payload.department_head_id = data.department_head_id ? Number(data.department_head_id) : null;
   }
 
-  return await prisma.department.update({
-    where: { department_id: Number(id) },
-    data: payload,
-    include: {
-      parentDepartment: true,
-      departmentHead: true,
-    },
-  });
+  return await departmentRepository.update(id, payload);
 };
 
 const deleteDepartment = async (id) => {
-  return await prisma.department.delete({
-    where: { department_id: Number(id) },
-  });
+  return await departmentRepository.deleteDepartment(id);
 };
 
 // Roles Services
 const getRoles = async () => {
-  return await prisma.role.findMany();
+  return await roleRepository.findMany();
 };
 
 // Users Services
@@ -100,33 +73,15 @@ const createUser = async (data) => {
     payload.department_id = Number(data.department_id);
   }
 
-  return await prisma.user.create({
-    data: payload,
-    include: {
-      department: true,
-      role: true,
-    },
-  });
+  return await userRepository.createUser(payload);
 };
 
 const getUsers = async () => {
-  return await prisma.user.findMany({
-    include: {
-      department: true,
-      role: true,
-    },
-  });
+  return await userRepository.findMany();
 };
 
 const getUserById = async (id) => {
-  return await prisma.user.findUnique({
-    where: { user_id: Number(id) },
-    include: {
-      department: true,
-      role: true,
-      headedDepartment: true,
-    },
-  });
+  return await userRepository.findById(id);
 };
 
 const updateUser = async (id, data) => {
@@ -148,20 +103,11 @@ const updateUser = async (id, data) => {
     payload.department_id = data.department_id ? Number(data.department_id) : null;
   }
 
-  return await prisma.user.update({
-    where: { user_id: Number(id) },
-    data: payload,
-    include: {
-      department: true,
-      role: true,
-    },
-  });
+  return await userRepository.update(id, payload);
 };
 
 const deleteUser = async (id) => {
-  return await prisma.user.delete({
-    where: { user_id: Number(id) },
-  });
+  return await userRepository.deleteUser(id);
 };
 
 module.exports = {

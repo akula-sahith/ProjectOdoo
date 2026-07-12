@@ -1,15 +1,16 @@
 const service = require('./service');
 const validator = require('./validator');
+const { sendSuccess, sendError } = require('../../utils/responseHelpers');
 
 // Department Controllers
 const createDepartment = async (req, res, next) => {
   try {
     const valErrors = validator.validateDepartment(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const dept = await service.createDepartment(req.body);
-    return res.status(201).json({ success: true, data: dept });
+    return sendSuccess(res, dept, 'Department created successfully', 201);
   } catch (error) {
     next(error);
   }
@@ -18,7 +19,7 @@ const createDepartment = async (req, res, next) => {
 const getDepartments = async (req, res, next) => {
   try {
     const depts = await service.getDepartments();
-    return res.status(200).json({ success: true, data: depts });
+    return sendSuccess(res, depts, 'Departments retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -28,9 +29,9 @@ const getDepartmentById = async (req, res, next) => {
   try {
     const dept = await service.getDepartmentById(req.params.id);
     if (!dept) {
-      return res.status(404).json({ success: false, message: 'Department not found' });
+      return sendError(res, 'Department not found', 404);
     }
-    return res.status(200).json({ success: true, data: dept });
+    return sendSuccess(res, dept, 'Department retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -40,10 +41,10 @@ const updateDepartment = async (req, res, next) => {
   try {
     const valErrors = validator.validateDepartment(req.body, true);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const dept = await service.updateDepartment(req.params.id, req.body);
-    return res.status(200).json({ success: true, data: dept });
+    return sendSuccess(res, dept, 'Department updated successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -52,7 +53,7 @@ const updateDepartment = async (req, res, next) => {
 const deleteDepartment = async (req, res, next) => {
   try {
     await service.deleteDepartment(req.params.id);
-    return res.status(200).json({ success: true, message: 'Department deleted successfully' });
+    return sendSuccess(res, null, 'Department deleted successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -62,7 +63,7 @@ const deleteDepartment = async (req, res, next) => {
 const getRoles = async (req, res, next) => {
   try {
     const roles = await service.getRoles();
-    return res.status(200).json({ success: true, data: roles });
+    return sendSuccess(res, roles, 'Roles retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -73,10 +74,10 @@ const createUser = async (req, res, next) => {
   try {
     const valErrors = validator.validateUser(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const user = await service.createUser(req.body);
-    return res.status(201).json({ success: true, data: user });
+    return sendSuccess(res, user, 'User created successfully', 201);
   } catch (error) {
     next(error);
   }
@@ -85,7 +86,7 @@ const createUser = async (req, res, next) => {
 const getUsers = async (req, res, next) => {
   try {
     const users = await service.getUsers();
-    return res.status(200).json({ success: true, data: users });
+    return sendSuccess(res, users, 'Users retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -95,9 +96,9 @@ const getUserById = async (req, res, next) => {
   try {
     const user = await service.getUserById(req.params.id);
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return sendError(res, 'User not found', 404);
     }
-    return res.status(200).json({ success: true, data: user });
+    return sendSuccess(res, user, 'User retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -107,10 +108,10 @@ const updateUser = async (req, res, next) => {
   try {
     const valErrors = validator.validateUser(req.body, true);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const user = await service.updateUser(req.params.id, req.body);
-    return res.status(200).json({ success: true, data: user });
+    return sendSuccess(res, user, 'User updated successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -119,7 +120,7 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
   try {
     await service.deleteUser(req.params.id);
-    return res.status(200).json({ success: true, message: 'User deleted successfully' });
+    return sendSuccess(res, null, 'User deleted successfully', 200);
   } catch (error) {
     next(error);
   }

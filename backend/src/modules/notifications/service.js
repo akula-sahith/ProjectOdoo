@@ -1,4 +1,4 @@
-const prisma = require('../../config/db');
+const notificationRepository = require('../../repositories/notificationRepository');
 
 const getNotifications = async (userId, filters = {}) => {
   const where = { user_id: Number(userId) };
@@ -6,19 +6,11 @@ const getNotifications = async (userId, filters = {}) => {
     where.is_read = filters.is_read === 'true' || filters.is_read === true;
   }
 
-  return await prisma.notification.findMany({
-    where,
-    orderBy: {
-      created_at: 'desc',
-    },
-  });
+  return await notificationRepository.findMany(where);
 };
 
 const markAsRead = async (id, userId) => {
-  const notification = await prisma.notification.findUnique({
-    where: { notification_id: Number(id) },
-  });
-
+  const notification = await notificationRepository.findById(id);
   if (!notification) {
     throw new Error('Notification not found');
   }
@@ -27,10 +19,7 @@ const markAsRead = async (id, userId) => {
     throw new Error('Unauthorized to mark this notification as read');
   }
 
-  return await prisma.notification.update({
-    where: { notification_id: Number(id) },
-    data: { is_read: true },
-  });
+  return await notificationRepository.update(id, { is_read: true });
 };
 
 module.exports = {

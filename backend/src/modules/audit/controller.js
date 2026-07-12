@@ -1,19 +1,20 @@
 const service = require('./service');
 const validator = require('./validator');
+const { sendSuccess, sendError } = require('../../utils/responseHelpers');
 
 // Cycle Controllers
 const createCycle = async (req, res, next) => {
   try {
     const valErrors = validator.validateAuditCycle(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const createdByUserId = req.user ? req.user.user_id : req.body.created_by;
     if (!createdByUserId) {
-      return res.status(400).json({ success: false, message: 'Created by user ID is required' });
+      return sendError(res, 'Created by user ID is required', 400);
     }
     const cycle = await service.createCycle(req.body, Number(createdByUserId));
-    return res.status(201).json({ success: true, data: cycle });
+    return sendSuccess(res, cycle, 'Audit cycle created successfully', 201);
   } catch (error) {
     next(error);
   }
@@ -22,7 +23,7 @@ const createCycle = async (req, res, next) => {
 const getCycles = async (req, res, next) => {
   try {
     const cycles = await service.getCycles(req.query);
-    return res.status(200).json({ success: true, data: cycles });
+    return sendSuccess(res, cycles, 'Audit cycles retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -32,9 +33,9 @@ const getCycleById = async (req, res, next) => {
   try {
     const cycle = await service.getCycleById(req.params.id);
     if (!cycle) {
-      return res.status(404).json({ success: false, message: 'Audit cycle not found' });
+      return sendError(res, 'Audit cycle not found', 404);
     }
-    return res.status(200).json({ success: true, data: cycle });
+    return sendSuccess(res, cycle, 'Audit cycle retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -45,17 +46,17 @@ const createRecord = async (req, res, next) => {
   try {
     const valErrors = validator.validateAuditRecord(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const auditorUserId = req.user ? req.user.user_id : req.body.auditor_id;
     if (!auditorUserId) {
-      return res.status(400).json({ success: false, message: 'Auditor ID is required' });
+      return sendError(res, 'Auditor ID is required', 400);
     }
     const record = await service.createRecord(req.body, Number(auditorUserId));
-    return res.status(201).json({ success: true, data: record });
+    return sendSuccess(res, record, 'Audit record submitted successfully', 201);
   } catch (error) {
     if (error.message.includes('not found') || error.message.includes('already audited')) {
-      return res.status(400).json({ success: false, message: error.message });
+      return sendError(res, error.message, 400);
     }
     next(error);
   }
@@ -64,7 +65,7 @@ const createRecord = async (req, res, next) => {
 const getRecords = async (req, res, next) => {
   try {
     const records = await service.getRecords(req.query);
-    return res.status(200).json({ success: true, data: records });
+    return sendSuccess(res, records, 'Audit records retrieved successfully', 200);
   } catch (error) {
     next(error);
   }

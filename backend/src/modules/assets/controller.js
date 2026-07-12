@@ -1,15 +1,16 @@
 const service = require('./service');
 const validator = require('./validator');
+const { sendSuccess, sendError } = require('../../utils/responseHelpers');
 
 // Category Controllers
 const createCategory = async (req, res, next) => {
   try {
     const valErrors = validator.validateCategory(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const cat = await service.createCategory(req.body);
-    return res.status(201).json({ success: true, data: cat });
+    return sendSuccess(res, cat, 'Asset category created successfully', 201);
   } catch (error) {
     next(error);
   }
@@ -18,7 +19,7 @@ const createCategory = async (req, res, next) => {
 const getCategories = async (req, res, next) => {
   try {
     const cats = await service.getCategories();
-    return res.status(200).json({ success: true, data: cats });
+    return sendSuccess(res, cats, 'Asset categories retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -28,9 +29,9 @@ const getCategoryById = async (req, res, next) => {
   try {
     const cat = await service.getCategoryById(req.params.id);
     if (!cat) {
-      return res.status(404).json({ success: false, message: 'Category not found' });
+      return sendError(res, 'Category not found', 404);
     }
-    return res.status(200).json({ success: true, data: cat });
+    return sendSuccess(res, cat, 'Asset category retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -40,10 +41,10 @@ const updateCategory = async (req, res, next) => {
   try {
     const valErrors = validator.validateCategory(req.body, true);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const cat = await service.updateCategory(req.params.id, req.body);
-    return res.status(200).json({ success: true, data: cat });
+    return sendSuccess(res, cat, 'Asset category updated successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -52,7 +53,7 @@ const updateCategory = async (req, res, next) => {
 const deleteCategory = async (req, res, next) => {
   try {
     await service.deleteCategory(req.params.id);
-    return res.status(200).json({ success: true, message: 'Category deleted successfully' });
+    return sendSuccess(res, null, 'Category deleted successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -63,14 +64,14 @@ const createAsset = async (req, res, next) => {
   try {
     const valErrors = validator.validateAsset(req.body);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     // Set created_by if present in req.user
     if (req.user && req.user.user_id) {
       req.body.created_by = req.user.user_id;
     }
     const asset = await service.createAsset(req.body);
-    return res.status(201).json({ success: true, data: asset });
+    return sendSuccess(res, asset, 'Asset created successfully', 201);
   } catch (error) {
     next(error);
   }
@@ -79,7 +80,7 @@ const createAsset = async (req, res, next) => {
 const getAssets = async (req, res, next) => {
   try {
     const assets = await service.getAssets(req.query);
-    return res.status(200).json({ success: true, data: assets });
+    return sendSuccess(res, assets, 'Assets retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -89,9 +90,9 @@ const getAssetById = async (req, res, next) => {
   try {
     const asset = await service.getAssetById(req.params.id);
     if (!asset) {
-      return res.status(404).json({ success: false, message: 'Asset not found' });
+      return sendError(res, 'Asset not found', 404);
     }
-    return res.status(200).json({ success: true, data: asset });
+    return sendSuccess(res, asset, 'Asset retrieved successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -101,10 +102,10 @@ const updateAsset = async (req, res, next) => {
   try {
     const valErrors = validator.validateAsset(req.body, true);
     if (valErrors) {
-      return res.status(400).json({ success: false, errors: valErrors });
+      return sendError(res, 'Validation error', 400, valErrors);
     }
     const asset = await service.updateAsset(req.params.id, req.body);
-    return res.status(200).json({ success: true, data: asset });
+    return sendSuccess(res, asset, 'Asset updated successfully', 200);
   } catch (error) {
     next(error);
   }
@@ -113,7 +114,7 @@ const updateAsset = async (req, res, next) => {
 const deleteAsset = async (req, res, next) => {
   try {
     await service.deleteAsset(req.params.id);
-    return res.status(200).json({ success: true, message: 'Asset deleted successfully' });
+    return sendSuccess(res, null, 'Asset deleted successfully', 200);
   } catch (error) {
     next(error);
   }
