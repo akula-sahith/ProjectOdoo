@@ -19,6 +19,10 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// API Routes
+const routes = require('./routes');
+app.use('/api', routes);
+
 // Health Check Endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
