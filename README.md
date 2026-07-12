@@ -1,4 +1,4 @@
-<img width="3353" height="2742" alt="image" src="https://github.com/user-attachments/assets/da054073-7910-493d-ace9-943f08024f88" />#  ProjectOdoo
+#  ProjectOdoo
 
 ## Enterprise Asset & Resource Management System
 
