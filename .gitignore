@@ -25,6 +25,7 @@ lerna-debug.log*
 # Environment and Secrets
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 *.cert
