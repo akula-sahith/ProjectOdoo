@@ -1,6 +1,20 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import { AppProvider, useApp } from './context/AppContext';
+import DashboardLayout from './layout/DashboardLayout';
+import { Toaster } from 'react-hot-toast';
+
+const ProtectedRoute = ({ children }) => {
+  const { user } = useApp();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
 
 function App() {
   const [count, setCount] = useState(0)
@@ -9,8 +23,20 @@ function App() {
     <AppProvider>
       <BrowserRouter>
         <Routes>
+<<<<<<< HEAD
           <Route path="/" element={<LandingPage />} />
 
+=======
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+              <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          ></Route>
+>>>>>>> 552aff3 (login and dashboard connected)
         </Routes>
       </BrowserRouter>
 
