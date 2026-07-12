@@ -548,35 +548,7 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 10. TESTIMONIALS SLIDER - Compact Section */}
-      <section className="py-20 bg-white border-b border-slate-100 font-medium">
-        <div className="max-w-6xl mx-auto px-6 md:px-8 space-y-12">
-          <div className="max-w-xl text-left space-y-2 mx-auto text-center">
-            <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Client Feedback</span>
-            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Trusted by Corporate Managers</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {[
-              { quote: 'AssetFlow streamlined our annual hardware inventory audit cycle from 3 weeks to just 2 days. The QR code passport scanner changed everything.', author: 'Dave Miller', title: 'VP of Operations, NetSecure', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=80' },
-              { quote: 'We resolved duplicate booking overlaps of executive Teslas and project rooms instantly. The overlap conflict validator is flawless.', author: 'Sarah Jenkins', title: 'Admin Director, CoreFinance', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=80' },
-              { quote: 'The linear depreciation curve reporting saves our finance team hours when calculating physical capital valuations every quarter.', author: 'Markus Vance', title: 'CFO, BuildCorp Ltd', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=80' }
-            ].map((t, idx) => (
-              <div key={idx} className="bg-slate-50/50 p-5 rounded-2xl border border-slate-200 flex flex-col justify-between h-56 shadow-xs">
-                <p className="text-slate-550 text-xs italic font-semibold leading-relaxed">"{t.quote}"</p>
-                <div className="flex items-center gap-2.5 pt-3.5 border-t border-slate-150/50 mt-4">
-                  <img src={t.avatar} alt="" className="w-8 h-8 rounded-full object-cover border" />
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold text-slate-800">{t.author}</p>
-                    <p className="text-[9px] text-slate-450 font-bold">{t.title}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* 12. FINAL CTA - Floating Grid Card with Spotlight Glow */}
       <section className="py-24 bg-white relative overflow-hidden flex justify-center">
         <div className="max-w-5xl w-full mx-6 md:mx-8 bg-white border border-slate-200 rounded-3xl p-10 md:p-16 relative overflow-hidden shadow-xl shadow-slate-100/50 bg-[radial-gradient(#f1f5f9_1.5px,transparent_1.5px)] [background-size:24px_24px]">
