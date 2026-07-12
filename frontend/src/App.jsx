@@ -6,6 +6,8 @@ import { AppProvider, useApp } from './context/AppContext';
 import DashboardLayout from './layout/DashboardLayout';
 import { Toaster } from 'react-hot-toast';
 import Dashboard from './pages/Dashboard';
+import Allocation from './pages/Allocation';
+import AllocationRequests from './pages/AllocationRequests';
 const ProtectedRoute = ({ children }) => {
   const { user } = useApp();
 
