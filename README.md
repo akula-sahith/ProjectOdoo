@@ -1,4 +1,4 @@
-#  ProjectOdoo
+<img width="3353" height="2742" alt="image" src="https://github.com/user-attachments/assets/da054073-7910-493d-ace9-943f08024f88" />#  ProjectOdoo
 
 ## Enterprise Asset & Resource Management System
 
@@ -111,6 +111,35 @@ The workflow consists of the following stages:
 A centralized Notification Engine continuously tracks business events and keeps all stakeholders informed in real time.
 
 <img width="1024" height="1536" alt="image" src="https://github.com/user-attachments/assets/ac073cf1-e6ec-47f3-8624-89c00636156c" />
+
+## 🗃️ Database Design
+
+PostgreSQL was chosen for strong ACID transactions, robust foreign key support, JSON field support, and enterprise-grade indexing/scalability.
+
+The schema is organized into 6 business modules and 15 tables:
+
+- **Authentication** — roles, users, sessions
+- **Organization** — departments, asset_categories
+- **Asset** — assets, asset_allocations, asset_transfers
+- **Booking** — resource_bookings
+- **Maintenance** — maintenance_requests
+- **Audit** — audit_cycles, audit_cycle_auditors, audit_records
+- **Notification** — notifications, activity_logs
+
+Key business rules enforced at the database level:
+- One asset can have many allocation records, but only **one active allocation** at a time (no double-allocation).
+- One asset **cannot have overlapping bookings** — enforced as a table-level time-range exclusion constraint.
+- Only assets flagged `is_bookable` can be booked.
+- Asset status transitions automatically based on allocation/maintenance events (e.g. `AVAILABLE → UNDER_MAINTENANCE` on maintenance approval).
+- One department has exactly one Department Head.
+- Every maintenance request, transfer, and audit record belongs to exactly one asset/cycle.
+- Every critical action is written to `activity_logs`.
+
+<img width="3353" height="2742" alt="image" src="https://github.com/user-attachments/assets/d61ad959-99c9-4e81-b64b-eb489700844f" />
+
+
+
+
 
 
 
