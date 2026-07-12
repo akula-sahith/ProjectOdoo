@@ -14,3 +14,20 @@ The platform aims to help organizations efficiently manage assets, track resourc
 | Pandu Ranga | Frontend Engineer & User Interface Designer |
 | Manoj Kumar | Backend Engineer and Database Design role |
 | Ratnakar | Frontend Engineer | 
+
+# 🛠️ Tech Stack
+
+AssetFlow is built using a modern full-stack architecture designed for scalability, modularity, and maintainability.
+
+| Layer | Technology |
+|--------|------------|
+| Frontend | React.js + Vite |
+| Styling | Tailwind CSS |
+| Backend | Node.js + Express.js |
+| Authentication | JWT, bcrypt |
+| Authorization | Role-Based Access Control (RBAC) |
+| Database | PostgreSQL |
+| ORM | Prisma ORM |
+| API | REST API |
+| Version Control | Git & GitHub |
+| Deployment | Vercel (Frontend), Render (Backend) |
